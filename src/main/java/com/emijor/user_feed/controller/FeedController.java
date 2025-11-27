@@ -1,10 +1,12 @@
 package com.emijor.user_feed.controller;
 
+import com.emijor.user_feed.dto.ArticleRatingDTO;
 import com.emijor.user_feed.dto.CreateFeedDTO;
 import com.emijor.user_feed.dto.FeedDTO;
 import com.emijor.user_feed.dto.UpdateFeedDTO;
 import com.emijor.user_feed.security.TokenService;
 import com.emijor.user_feed.security.User;
+import com.emijor.user_feed.services.ArticleRatingService;
 import com.emijor.user_feed.services.FeedService;
 import com.emijor.user_feed.utils.errors.BadRequestError;
 import com.emijor.user_feed.utils.errors.ForbiddenError;
@@ -28,6 +30,9 @@ public class FeedController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private ArticleRatingService articleRatingService;
 
     @GetMapping("/{id}")
     public ResponseEntity<FeedDTO> getAFeed(@PathVariable Long id) throws NotFoundError {
@@ -77,6 +82,13 @@ public class FeedController {
     public ResponseEntity<List<FeedDTO>> getFeedsByArticle(@PathVariable String idArticle) {
         List<FeedDTO> feedDTOS = feedService.getFeedsByArticulo(idArticle);
         return ResponseEntity.ok(feedDTOS);
+    }
+
+    @GetMapping("/article/{idArticle}/rating")
+    public ResponseEntity<ArticleRatingDTO> getArticleRating(@PathVariable String idArticle) throws NotFoundError {
+        ArticleRatingDTO rating = articleRatingService.getArticleRating(idArticle)
+                .orElseThrow(() -> new NotFoundError("No hay reseñas para este artículo"));
+        return ResponseEntity.ok(rating);
     }
 
     @GetMapping("/my-feeds")

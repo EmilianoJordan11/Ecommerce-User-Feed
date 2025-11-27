@@ -80,6 +80,21 @@ Microservicio que permite a los usuarios crear reseñas sobre artículos que hay
   - Si la reseña no existe (consulta por ID), devuelve error 404.
   - Si el usuario no está autenticado (mis reseñas), devuelve error 401.
 
+### CU: Consulta de Promedio de Calificaciones
+
+- Precondición: Ninguna (endpoint público).
+
+- Camino normal:
+
+  - Se solicita el promedio de calificaciones de un artículo específico.
+  - El sistema devuelve el promedio precalculado, la cantidad total de reseñas y la fecha de última actualización.
+
+- Caminos alternativos:
+
+  - Si el artículo no tiene reseñas, devuelve error 404.
+
+- Nota: El promedio se precalcula automáticamente cada vez que se crea, modifica o elimina una reseña del artículo.
+
 ## Modelo de datos
 
 **Feed**
@@ -97,6 +112,15 @@ Microservicio que permite a los usuarios crear reseñas sobre artículos que hay
 **Índices:**
 
 - Índice único compuesto: `{ userId, articleId }` - Previene reseñas duplicadas del mismo usuario al mismo artículo.
+
+**ArticleRating**
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| articleId | String (PK) | ID del artículo (clave primaria) |
+| averageRating | Double | Promedio de calificaciones (1.0 - 5.0) |
+| totalReviews | Integer | Cantidad total de reseñas del artículo |
+| updatedAt | DateTime | Fecha de última actualización del promedio |
 
 ## Interfaz REST
 
@@ -332,6 +356,37 @@ Microservicio que permite a los usuarios crear reseñas sobre artículos que hay
     "updatedAt": null
   }
 ]
+```
+
+---
+
+### Obtener Promedio de Calificaciones de un Artículo
+
+`GET /v1/feed/article/{articleId}/rating`
+
+**Params path**
+
+- articleId: ID del artículo
+
+**Response**
+
+`200 OK`
+
+```json
+{
+  "articleId": "6927da17c3255b97d5a1acbb",
+  "averageRating": 4.5,
+  "totalReviews": 10,
+  "updatedAt": "2025-11-27T15:30:00"
+}
+```
+
+`404 NOT FOUND`
+
+```json
+{
+  "error": "No hay reseñas para este artículo"
+}
 ```
 
 ---

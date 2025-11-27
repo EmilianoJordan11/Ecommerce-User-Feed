@@ -26,6 +26,9 @@ public class FeedService {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private ArticleRatingService articleRatingService;
+
     public FeedDTO getAFeed(Long id) throws NotFoundError {
         Feed feed = feedRepository.findById(id)
                 .orElseThrow(() -> new NotFoundError("Feed no encontrado"));
@@ -49,6 +52,10 @@ public class FeedService {
         // Crear el feed
         Feed feed = new Feed(dto, userId);
         feed = feedRepository.save(feed);
+        
+        // Recalcular promedio del artículo
+        articleRatingService.recalculateRating(dto.articleId());
+        
         return new FeedDTO(feed);
     }
 
@@ -69,6 +76,11 @@ public class FeedService {
             feed.setUpdatedAt(LocalDateTime.now());
         }
 
+        // Recalcular promedio si cambió el rating
+        if (dto.rating() != null) {
+            articleRatingService.recalculateRating(feed.getArticleId());
+        }
+
         return new FeedDTO(feed);
     }
 
@@ -81,7 +93,11 @@ public class FeedService {
             throw new ForbiddenError("No tienes permiso para eliminar este feed");
         }
 
+        String articleId = feed.getArticleId();
         feedRepository.deleteById(id);
+        
+        // Recalcular promedio del artículo
+        articleRatingService.recalculateRating(articleId);
     }
 
     public List<FeedDTO> getFeedsByArticulo(String idArticle) {

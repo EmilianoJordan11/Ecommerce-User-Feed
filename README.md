@@ -60,6 +60,7 @@ orders-server-url: http://localhost:3004    # URL del microservicio Orders
 |--------|----------|-------------|------|
 | GET | `/v1/feed/{id}` | Obtener reseña por ID | ❌ |
 | GET | `/v1/feed/article/{articleId}` | Reseñas de un artículo | ❌ |
+| GET | `/v1/feed/article/{articleId}/rating` | Promedio de calificaciones | ❌ |
 | GET | `/v1/feed/my-feeds` | Mis reseñas | ✅ |
 | POST | `/v1/feed` | Crear reseña | ✅ |
 | PUT | `/v1/feed/{id}` | Actualizar reseña | ✅ |
@@ -91,6 +92,29 @@ curl -X POST http://localhost:3005/v1/feed \
 - Rating entre 1 y 5
 - Solo el dueño puede modificar su reseña
 - Solo el dueño o admin puede eliminar una reseña
+- El promedio de calificaciones se recalcula automáticamente al crear, modificar o eliminar una reseña
+
+## ⭐ Promedio de calificaciones
+
+El promedio de calificaciones por artículo se precalcula y almacena en una entidad separada (`ArticleRating`). Se actualiza automáticamente cada vez que:
+
+- Se crea una nueva reseña
+- Se modifica el rating de una reseña existente
+- Se elimina una reseña
+
+```bash
+curl http://localhost:3005/v1/feed/article/6927da17c3255b97d5a1acbb/rating
+```
+
+Respuesta:
+```json
+{
+  "articleId": "6927da17c3255b97d5a1acbb",
+  "averageRating": 4.5,
+  "totalReviews": 10,
+  "updatedAt": "2025-11-27T15:30:00"
+}
+```
 
 ## 🐰 RabbitMQ
 
