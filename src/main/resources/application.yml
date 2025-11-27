@@ -1,19 +1,30 @@
+server:
+  port: 3005
+
 spring:
   application:
-    name: StockMaster
+    name: user-feed
 
   datasource:
     url: jdbc:postgresql://localhost:5432/user-feed
     username: postgres
     password: SQLPassword
-    #    initialization-mode: always
-#  sql:
-#    init:
-#      mode: always
-#
+
   jpa:
-#    defer-datasource-initialization: true
-#    hibernate:
-#      ddl-auto: create
     show-sql: true
-    format-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Configuración de RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5672
+    # Credenciales por defecto de RabbitMQ en Docker
+    # Si usas otras credenciales, cámbialas aquí
+    username: EmiJor
+    password: emilianojordan13
+
+# Configuración de seguridad - URL del servicio Auth
+security:
+  auth-server-url: http://localhost:3000
