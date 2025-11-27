@@ -6,6 +6,7 @@ import com.emijor.user_feed.dto.UpdateFeedDTO;
 import com.emijor.user_feed.entities.Feed;
 import com.emijor.user_feed.repository.FeedRepository;
 import com.emijor.user_feed.security.User;
+import com.emijor.user_feed.utils.errors.BadRequestError;
 import com.emijor.user_feed.utils.errors.ForbiddenError;
 import com.emijor.user_feed.utils.errors.NotFoundError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,29 +23,35 @@ public class FeedService {
     @Autowired
     private FeedRepository feedRepository;
 
-    /**
-     * Obtiene un feed por su ID.
-     */
+    @Autowired
+    private OrderService orderService;
+
     public FeedDTO getAFeed(Long id) throws NotFoundError {
         Feed feed = feedRepository.findById(id)
                 .orElseThrow(() -> new NotFoundError("Feed no encontrado"));
         return new FeedDTO(feed);
     }
 
-    /**
-     * Crea un nuevo feed.
-     * El userId se obtiene del token de autenticación.
-     */
-    public FeedDTO createFeed(CreateFeedDTO dto, String userId) {
+    public FeedDTO createFeed(CreateFeedDTO dto, String userId, String token) throws BadRequestError {
+        // Validación 1: El usuario no puede tener más de una reseña por artículo
+        List<Feed> existingReviews = feedRepository.findByUserIdAndArticleId(userId, dto.articleId());
+        if (!existingReviews.isEmpty()) {
+            throw new BadRequestError("Ya tienes una reseña para este artículo");
+        }
+
+        // Validación 2: El usuario debe tener alguna orden con ese artículo
+        if (!orderService.userHasOrderWithArticle(token, dto.articleId())) {
+            throw new BadRequestError(
+                "No puedes reseñar este artículo. Solo puedes reseñar artículos que hayas comprado"
+            );
+        }
+
+        // Crear el feed
         Feed feed = new Feed(dto, userId);
         feed = feedRepository.save(feed);
         return new FeedDTO(feed);
     }
 
-    /**
-     * Actualiza un feed existente.
-     * Solo el dueño del feed puede actualizarlo.
-     */
     @Transactional
     public FeedDTO updateFeed(Long id, UpdateFeedDTO dto, String userId) throws NotFoundError, ForbiddenError {
         Feed feed = feedRepository.findById(id)
@@ -65,10 +72,6 @@ public class FeedService {
         return new FeedDTO(feed);
     }
 
-    /**
-     * Elimina un feed.
-     * Solo el dueño del feed o un administrador puede eliminarlo.
-     */
     public void deleteFeed(Long id, User user) throws NotFoundError, ForbiddenError {
         Feed feed = feedRepository.findById(id)
                 .orElseThrow(() -> new NotFoundError("Feed no encontrado"));
@@ -81,9 +84,6 @@ public class FeedService {
         feedRepository.deleteById(id);
     }
 
-    /**
-     * Obtiene todos los feeds de un artículo.
-     */
     public List<FeedDTO> getFeedsByArticulo(String idArticle) {
         List<Feed> feeds = feedRepository.findByArticleId(idArticle);
         List<FeedDTO> feedDTOS = new ArrayList<>();
@@ -93,9 +93,6 @@ public class FeedService {
         return feedDTOS;
     }
 
-    /**
-     * Obtiene todos los feeds de un usuario específico.
-     */
     public List<FeedDTO> getFeedsByUser(String userId) {
         List<Feed> feeds = feedRepository.findByUserId(userId);
         List<FeedDTO> feedDTOS = new ArrayList<>();

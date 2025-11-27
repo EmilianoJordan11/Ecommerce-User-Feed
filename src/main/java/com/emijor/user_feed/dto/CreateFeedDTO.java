@@ -5,15 +5,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * DTO para crear un nuevo Feed.
- * El userId se obtiene del token de autenticación, no del body.
- */
 public record CreateFeedDTO(
         @NotBlank(message = "El articleId es requerido")
         String articleId,
-
-        String orderId,
 
         String comment,
 

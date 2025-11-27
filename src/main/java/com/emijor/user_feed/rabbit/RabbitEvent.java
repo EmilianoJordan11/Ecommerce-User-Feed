@@ -3,53 +3,27 @@ package com.emijor.user_feed.rabbit;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Estructura de los eventos de RabbitMQ.
- * Soporta tanto el formato genérico como el formato de Auth.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RabbitEvent {
     
-    /**
-     * Tipo de mensaje enviado (ej: "logout", "article-data", etc.)
-     * Usado por algunos microservicios
-     */
     @JsonProperty("type")
     private String type;
 
-    /**
-     * ID de correlación para tracking (usado por Auth)
-     */
     @JsonProperty("correlation_id")
     private String correlationId;
 
-    /**
-     * Routing key del mensaje
-     */
     @JsonProperty("routing_key")
     private String routingKey;
 
-    /**
-     * Versión del protocolo
-     */
     @JsonProperty("version")
     private int version;
 
-    /**
-     * Queue de origen (por si el destinatario necesita responder)
-     */
     @JsonProperty("queue")
     private String queue;
 
-    /**
-     * Exchange de origen
-     */
     @JsonProperty("exchange")
     private String exchange;
 
-    /**
-     * El contenido/body del mensaje
-     */
     @JsonProperty("message")
     private Object message;
 

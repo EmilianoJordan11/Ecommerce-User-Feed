@@ -26,9 +26,6 @@ public class Feed {
     @Column(name = "article_id", nullable = false)
     private String articleId;
 
-    @Column(name = "order_id")
-    private String orderId;
-
     @Column(columnDefinition = "TEXT")
     private String comment;
 
@@ -41,14 +38,9 @@ public class Feed {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    /**
-     * Constructor para crear un Feed desde un DTO.
-     * El userId se obtiene del token de autenticación.
-     */
     public Feed(CreateFeedDTO feedDTO, String userId) {
         this.userId = userId;
         this.articleId = feedDTO.articleId();
-        this.orderId = feedDTO.orderId();
         this.comment = feedDTO.comment();
         this.rating = feedDTO.rating();
         this.createdAt = LocalDateTime.now();

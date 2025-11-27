@@ -8,16 +8,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-/**
- * Un Map con expiración automática de elementos.
- * Esta clase contiene un thread que periódicamente verifica si algún objeto
- * debe ser eliminado basándose en el tiempo de vida configurado.
- * 
- * Se utiliza para cachear tokens de usuario y evitar consultas repetitivas al servicio Auth.
- *
- * @param <K> Tipo de la clave (generalmente el token)
- * @param <V> Tipo del valor (generalmente User)
- */
 public class ExpiringMap<K, V> implements Map<K, V> {
 
     public static final int DEFAULT_TIME_TO_LIVE = 60;
@@ -37,12 +27,6 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         this(timeToLive, DEFAULT_EXPIRATION_INTERVAL);
     }
 
-    /**
-     * Crea una nueva instancia de ExpiringMap.
-     *
-     * @param timeToLive          Tiempo de vida en segundos
-     * @param expirationInterval  Intervalo de verificación en segundos
-     */
     public ExpiringMap(int timeToLive, int expirationInterval) {
         this.delegate = new ConcurrentHashMap<>();
         this.expirationListeners = new CopyOnWriteArrayList<>();
@@ -164,9 +148,6 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         expirer.setTimeToLive(timeToLive);
     }
 
-    /**
-     * Objeto interno que almacena el valor junto con su tiempo de último acceso.
-     */
     private class ExpiringObject {
         private final K key;
         private final V value;
@@ -219,9 +200,6 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         }
     }
 
-    /**
-     * Thread que monitorea el ExpiringMap y elimina elementos que han expirado.
-     */
     public class Expirer implements Runnable {
         private final ReadWriteLock stateLock = new ReentrantReadWriteLock();
         private long timeToLiveMillis;
@@ -353,9 +331,6 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         }
     }
 
-    /**
-     * Interfaz para escuchar eventos de expiración.
-     */
     public interface ExpirationListener<E> {
         void expired(E expiredObject);
     }

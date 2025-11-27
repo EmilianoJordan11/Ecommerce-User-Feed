@@ -16,15 +16,16 @@ spring:
       hibernate:
         format_sql: true
 
-  # Configuración de RabbitMQ
+  # RabbitMQ
   rabbitmq:
     host: localhost
     port: 5672
-    # Credenciales por defecto de RabbitMQ en Docker
-    # Si usas otras credenciales, cámbialas aquí
     username: EmiJor
     password: emilianojordan13
 
-# Configuración de seguridad - URL del servicio Auth
+# URL Auth
 security:
   auth-server-url: http://localhost:3000
+
+# URL Orders
+orders-server-url: http://localhost:3004

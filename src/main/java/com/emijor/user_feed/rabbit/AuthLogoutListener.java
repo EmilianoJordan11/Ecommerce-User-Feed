@@ -10,18 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Listener que procesa los eventos de logout desde el servicio Auth.
- * 
- * Cuando Auth envía un broadcast de logout, este listener recibe el mensaje
- * e invalida el token correspondiente del cache local.
- * 
- * Formato del mensaje esperado:
- * {
- *   "type": "logout",
- *   "message": "Bearer tokenId"
- * }
- */
 @Component
 public class AuthLogoutListener {
 
@@ -32,20 +20,6 @@ public class AuthLogoutListener {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Procesa los mensajes recibidos desde la cola de Auth.
-     * Usa @RabbitListener para recibir mensajes directamente.
-     * 
-     * Auth envía el formato:
-     * {
-     *   "correlation_id": "uuid",
-     *   "exchange": "",
-     *   "routing_key": "",
-     *   "message": "Bearer token..."
-     * }
-     * 
-     * @param messageBytes Mensaje en formato bytes desde RabbitMQ
-     */
     @RabbitListener(queues = RabbitConfig.AUTH_QUEUE)
     public void handleMessage(byte[] messageBytes) {
         String message = new String(messageBytes, StandardCharsets.UTF_8);
@@ -72,9 +46,6 @@ public class AuthLogoutListener {
         }
     }
 
-    /**
-     * Procesa el evento de logout invalidando el token en cache.
-     */
     private void processLogout(String token) {
         if (token == null || token.isBlank()) {
             logger.log(Level.WARNING, "Evento logout sin token");

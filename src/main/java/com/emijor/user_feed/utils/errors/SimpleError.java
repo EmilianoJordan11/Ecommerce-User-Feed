@@ -1,9 +1,5 @@
 package com.emijor.user_feed.utils.errors;
 
-/**
- * Error simple que puede ser serializado como JSON.
- * Base para todos los errores personalizados del microservicio.
- */
 public class SimpleError extends Exception {
     private static final long serialVersionUID = 1L;
 

@@ -1,0 +1,1 @@
+ALTER TABLE feed DROP COLUMN order_id;
